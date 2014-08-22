@@ -19,10 +19,11 @@ module.exports = function(app, express){
   app.get('/contact', home.contact);
   app.get('/faq', home.faq);
 
-  app.get('/treasure/new', treasures.init);
-  app.get('/treasure', treasures.index);
-  app.post('/treasure', treasures.create);
-  app.get('/treasure/:id', treasures.show);
+  app.get('/treasures/new', treasures.init);
+  app.get('/treasures', treasures.index);
+  app.post('/treasures', treasures.create);
+  app.get('/treasures/:id', treasures.show);
+  app.post('/treasures/:id/found', treasures.isFound);
 
   console.log('Express: Routes Loaded');
 };

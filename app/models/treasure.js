@@ -1,15 +1,18 @@
 'use strict';
 
 var Mongo = require('mongodb'),
+    fs    = require('fs'),
+    path  = require('path'),
     _     = require('lodash');
 
 function Treasure(o){
-  this.name       = o.name;
-  this.photo      = o.photo;
-  this.lat        = parseFloat(o.lat);
-  this.lng        = parseFloat(o.lng);
-  this.difficulty = o.difficulty;
-  this.hint       = o.hint;
+  console.log('TNAME', o);
+  this.tname      = o.tname[0];
+  this.photos     = [];
+  this.loc        = {name:o.loc[0], lat:parseFloat(o.lat[0]), lng:parseFloat(o.lng[0])};
+  this.difficulty = o.difficulty[0];
+  this.hint       = o.hint[0];
+  this.isFound    = false;
 }
 
 Object.defineProperty(Treasure, 'collection', {
@@ -28,10 +31,29 @@ Treasure.findById = function(id, cb){
   });
 };
 
-Treasure.create = function(treasure, cb){
-  var t = new Treasure(treasure);
+Treasure.create = function(fields, files, cb){
+  var t   = new Treasure(fields);
   Treasure.collection.save(t, cb);
+  return(t);
 };
+
+Treasure.prototype.uploadPhoto = function(photo, cb){
+  var dir = __dirname + '/../static/img/' + this._id,
+      ext = path.extname(photo.photo[0].path),
+      abs = dir + '/' + this.tname + ext;
+  fs.mkdirSync(dir);
+
+  fs.renameSync(photo.photo[0].path, abs);
+  this.image = abs;
+  Treasure.collection.save(this, cb);
+};
+
+Treasure.prototype.toggle = function(){
+  this.isFound = true;
+};
+/*Treasure.prototype.save = function(cb){
+  Treasure.collection.save(this, cb);
+};*/
 
 module.exports = Treasure;
 
